@@ -38,7 +38,6 @@ for (let i = 1; i <= process.env.THREADS; i++) {
         if (!workers.length > 0) {
             stream.write(']');
             stream.close();
-            process.exit();
         }
     })
 }
