@@ -25,6 +25,8 @@ for (let i = 1; i <= process.env.THREADS; i++) {
         workerData: {id: i, start: startId, end: endId},
     });
 
+    workers.push(worker);
+
     worker.on('message', (data) => {
         if (data.id) {
             stream.write(JSON.stringify({name: data.name, vk: data.vk}) + ', ');
@@ -33,8 +35,7 @@ for (let i = 1; i <= process.env.THREADS; i++) {
     });
 
     worker.on('exit', () => {
-        delete workers[worker.threadId + 1];
-
+        delete workers[worker.threadId - 1];
         if (!workers.length > 0) {
             stream.write(']');
             stream.close();
