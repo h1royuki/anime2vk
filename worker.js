@@ -15,16 +15,15 @@ const e = async () => {
 
                 $('.no-margin-bottom > li > a').each((k, element) => {
                     const href = $(element).attr('href');
-                    if (href.match('^[https\\:\\/vk\\.com\\/]*')) {
+                    if (href.match(/https:\/\/vk\.com\//g)) {
                         vk = href;
                     }
                 });
 
                 if (vk) {
                     parentPort.postMessage({id: i, name: name, vk: vk});
-                    parentPort.postMessage('#' + workerData.id + ': item ' + i + ' of ' + workerData.end + ' ' + name + ' - found');
                 } else {
-                    parentPort.postMessage('#' + workerData.id + ': item ' + i + ' of ' + workerData.end + ' ' + name + ' - not found');
+                    parentPort.postMessage('');
                 }
             }
         } catch (e) {

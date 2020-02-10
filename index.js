@@ -4,6 +4,7 @@ const fs = require('fs');
 
 const accs = {};
 const workers = [];
+let counter = 0;
 
 const usersPerWorker = Math.ceil((process.env.LIMIT - 4770) / process.env.THREADS);
 
@@ -18,9 +19,10 @@ for (let i = 1; i <= process.env.THREADS; i++) {
     worker.on('message', (data) => {
         if(data.id) {
             accs[data.id] = {name: data.name, vk: data.vk};
-        } else {
-            console.log(data);
         }
+
+        process.stdout.write('\033c');
+        console.log('Parse ' + ++counter + ' of ' + process.env.LIMIT);
     });
 
     worker.on('close', () => {
