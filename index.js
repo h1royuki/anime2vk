@@ -3,14 +3,11 @@ const {Worker} = require('worker_threads');
 const fs = require('fs');
 const cliProgress = require('cli-progress');
 
-const bar = new cliProgress.SingleBar({}, cliProgress.Presets.rect);
+const bar = new cliProgress.SingleBar({
+    format: 'Workers [{bar}] {percentage}% | ETA: {eta_formatted} | {value}/{total}'
+}, cliProgress.Presets.shades_classic);
 
-const multibar = new cliProgress.MultiBar({
-    clearOnComplete: false,
-    hideCursor: true,
-    format: 'Worker {worker} [{bar}] {percentage}% | ETA: {eta_formatted} | {value}/{total}'
-}, cliProgress.Presets.shades_grey);
-
+bar.start(process.env.LIMIT, 0);
 
 const accs = {};
 const workers = [];
@@ -24,14 +21,13 @@ for (let i = 1; i <= process.env.THREADS; i++) {
     const worker = new Worker(__dirname + '/worker.js', {
         workerData: {id: i, start: startId, end: endId},
     });
-    const bar = multibar.create(usersPerWorker, 0, {worker: i});
-    let counter = 0;
 
     worker.on('message', (data) => {
         if (data.id) {
             accs[data.id] = {name: data.name, vk: data.vk};
-            bar.update(++counter, {user: data.name});
         }
+
+        bar.increment();
     });
 
     worker.on('close', () => {
@@ -41,7 +37,6 @@ for (let i = 1; i <= process.env.THREADS; i++) {
     workers.push(worker);
 }
 
-bar.stop();
 fs.writeFileSync('accs.json', accs);
 
 
